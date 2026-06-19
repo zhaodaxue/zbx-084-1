@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { getStations, getDailySummary, getDayDetail, getStationStats } from '../services/data.service.js';
+import { getStations, getDailySummary, getDailySummaryAll, getDayDetail, getStationStats } from '../services/data.service.js';
 import { ApiResponse, DailySummary, WaterRecord } from '../types/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -65,6 +65,32 @@ export async function handleGetDailySummary(req: Request, res: Response<ApiRespo
     res.status(500).json({
       success: false,
       error: err instanceof Error ? err.message : '获取日汇总数据失败'
+    });
+  }
+}
+
+export async function handleGetDailySummaryAll(req: Request, res: Response<ApiResponse<DailySummary[]>>): Promise<void> {
+  try {
+    const { station_id } = req.query;
+
+    if (!station_id || typeof station_id !== 'string') {
+      res.status(400).json({
+        success: false,
+        error: '缺少station_id参数'
+      });
+      return;
+    }
+
+    const summary = await getDailySummaryAll(station_id);
+    res.json({
+      success: true,
+      data: summary
+    });
+  } catch (err) {
+    console.error('Get daily summary all error:', err);
+    res.status(500).json({
+      success: false,
+      error: err instanceof Error ? err.message : '获取全部日汇总数据失败'
     });
   }
 }

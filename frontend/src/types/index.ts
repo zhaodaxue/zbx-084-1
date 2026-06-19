@@ -44,4 +44,15 @@ export interface CalendarDay {
   hasData: boolean;
   maxTurbidity?: number;
   maxPhDeviation?: number;
+  isHighlighted?: boolean;
+}
+
+export interface AnomalySegment {
+  id: string;
+  startDate: string;
+  endDate: string;
+  durationDays: number;
+  anomalyDaysCount: number;
+  anomalyRatio: number;
+  anomalyDates: string[];
 }

@@ -56,6 +56,43 @@ export async function getDailySummary(
   });
 }
 
+export async function getDailySummaryAll(stationId: string): Promise<DailySummary[]> {
+  const db = await getDb();
+
+  const rows = await db.all<{
+    date: string;
+    station_id: string;
+    max_turbidity: number;
+    min_ph: number;
+    max_ph: number;
+  }[]>(`
+    SELECT 
+      date,
+      station_id,
+      MAX(turbidity_ntu) as max_turbidity,
+      MIN(ph) as min_ph,
+      MAX(ph) as max_ph
+    FROM water_records
+    WHERE station_id = ?
+    GROUP BY date, station_id
+    ORDER BY date
+  `, stationId);
+
+  return rows.map(row => {
+    const minDeviation = calculatePhDeviation(row.min_ph);
+    const maxDeviation = calculatePhDeviation(row.max_ph);
+    const maxPhDeviation = Math.max(minDeviation, maxDeviation);
+
+    return {
+      date: row.date,
+      station_id: row.station_id,
+      max_turbidity: row.max_turbidity,
+      max_ph_deviation: maxPhDeviation,
+      is_anomaly: isAnomaly(row.max_turbidity, maxPhDeviation)
+    };
+  });
+}
+
 export async function getDayDetail(
   stationId: string,
   date: string

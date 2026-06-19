@@ -7,6 +7,7 @@ import { handleImport, uploadMiddleware } from './controllers/import.controller.
 import {
   handleGetStations,
   handleGetDailySummary,
+  handleGetDailySummaryAll,
   handleGetDayDetail,
   handleGetStationStats,
   handleDownloadSample
@@ -28,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/api/import', uploadMiddleware, handleImport);
 app.get('/api/stations', handleGetStations);
 app.get('/api/daily-summary', handleGetDailySummary);
+app.get('/api/daily-summary-all', handleGetDailySummaryAll);
 app.get('/api/day-detail', handleGetDayDetail);
 app.get('/api/station-stats', handleGetStationStats);
 app.get('/api/sample.csv', handleDownloadSample);

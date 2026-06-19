@@ -50,6 +50,15 @@ export async function getDailySummary(
   return handleResponse<DailySummary[]>(response);
 }
 
+export async function getDailySummaryAll(stationId: string): Promise<DailySummary[]> {
+  const params = new URLSearchParams({
+    station_id: stationId
+  });
+  
+  const response = await fetch(`${API_BASE}/daily-summary-all?${params}`);
+  return handleResponse<DailySummary[]>(response);
+}
+
 export async function getDayDetail(
   stationId: string,
   date: string

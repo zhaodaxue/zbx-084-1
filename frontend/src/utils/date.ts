@@ -10,6 +10,23 @@ export function parseDate(dateStr: string): Date {
   return new Date(year, month - 1, day);
 }
 
+export function addDays(dateStr: string, days: number): string {
+  const d = parseDate(dateStr);
+  d.setDate(d.getDate() + days);
+  return formatDate(d);
+}
+
+export function daysBetween(start: string, end: string): number {
+  const oneDay = 24 * 60 * 60 * 1000;
+  const s = parseDate(start).getTime();
+  const e = parseDate(end).getTime();
+  return Math.round((e - s) / oneDay) + 1;
+}
+
+export function isNextDay(prev: string, curr: string): boolean {
+  return addDays(prev, 1) === curr;
+}
+
 export function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
@@ -38,7 +55,8 @@ export function formatDisplayDate(dateStr: string): string {
 export function generateCalendarDays(
   year: number,
   month: number,
-  summaryMap: Map<string, { is_anomaly: boolean; max_turbidity: number; max_ph_deviation: number }>
+  summaryMap: Map<string, { is_anomaly: boolean; max_turbidity: number; max_ph_deviation: number }>,
+  highlightedDates: Set<string> = new Set()
 ) {
   const days: Array<{
     date: string;
@@ -48,6 +66,7 @@ export function generateCalendarDays(
     hasData: boolean;
     maxTurbidity?: number;
     maxPhDeviation?: number;
+    isHighlighted?: boolean;
   }> = [];
   
   const daysInMonth = getDaysInMonth(year, month);
@@ -68,7 +87,8 @@ export function generateCalendarDays(
       hasData: !!summary,
       isAnomaly: summary?.is_anomaly,
       maxTurbidity: summary?.max_turbidity,
-      maxPhDeviation: summary?.max_ph_deviation
+      maxPhDeviation: summary?.max_ph_deviation,
+      isHighlighted: highlightedDates.has(date)
     });
   }
   
@@ -82,7 +102,8 @@ export function generateCalendarDays(
       hasData: !!summary,
       isAnomaly: summary?.is_anomaly,
       maxTurbidity: summary?.max_turbidity,
-      maxPhDeviation: summary?.max_ph_deviation
+      maxPhDeviation: summary?.max_ph_deviation,
+      isHighlighted: highlightedDates.has(date)
     });
   }
   
@@ -100,7 +121,8 @@ export function generateCalendarDays(
       hasData: !!summary,
       isAnomaly: summary?.is_anomaly,
       maxTurbidity: summary?.max_turbidity,
-      maxPhDeviation: summary?.max_ph_deviation
+      maxPhDeviation: summary?.max_ph_deviation,
+      isHighlighted: highlightedDates.has(date)
     });
   }
   
