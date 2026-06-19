@@ -7,7 +7,7 @@ import type { ImportReport } from '../types';
 const CsvUploader: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const { setImportReport, setError } = useAppStore();
+  const { setImportReport, setError, setLastImportTime, refreshStationsAndSelectFirst, setStationStats, setDailySummary, setSelectedStation } = useAppStore();
 
   const handleFile = useCallback(async (file: File) => {
     if (!file.name.toLowerCase().endsWith('.csv')) {
@@ -21,12 +21,17 @@ const CsvUploader: React.FC = () => {
     try {
       const report: ImportReport = await importCsv(file);
       setImportReport(report);
+      setStationStats(null);
+      setDailySummary([]);
+      setSelectedStation(null);
+      setLastImportTime();
+      await refreshStationsAndSelectFirst();
     } catch (err) {
       setError(err instanceof Error ? err.message : '上传失败');
     } finally {
       setIsUploading(false);
     }
-  }, [setError, setImportReport]);
+  }, [setError, setImportReport, setLastImportTime, refreshStationsAndSelectFirst, setStationStats, setDailySummary, setSelectedStation]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -144,7 +149,7 @@ const ImportReportDisplay: React.FC = () => {
         </button>
       </div>
       
-      <div className="grid grid-cols-3 gap-3 text-sm">
+      <div className="grid grid-cols-4 gap-3 text-sm">
         <div className="bg-white rounded-lg p-3 text-center">
           <p className="text-slate-500 text-xs">总行数</p>
           <p className="text-xl font-bold text-slate-800">{importReport.total_rows}</p>
@@ -154,8 +159,12 @@ const ImportReportDisplay: React.FC = () => {
           <p className="text-xl font-bold text-green-600">{importReport.imported_rows}</p>
         </div>
         <div className="bg-white rounded-lg p-3 text-center">
-          <p className="text-slate-500 text-xs">跳过行数</p>
-          <p className="text-xl font-bold text-amber-600">{importReport.skipped_rows}</p>
+          <p className="text-slate-500 text-xs">重复跳过</p>
+          <p className="text-xl font-bold text-blue-600">{importReport.duplicate_rows || 0}</p>
+        </div>
+        <div className="bg-white rounded-lg p-3 text-center">
+          <p className="text-slate-500 text-xs">其他跳过</p>
+          <p className="text-xl font-bold text-amber-600">{importReport.skipped_rows - (importReport.duplicate_rows || 0)}</p>
         </div>
       </div>
 

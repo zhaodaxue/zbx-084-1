@@ -18,6 +18,7 @@ export interface DailySummary {
 export interface ImportReport {
   total_rows: number;
   imported_rows: number;
+  duplicate_rows?: number;
   skipped_rows: number;
   skipped_reasons: string[];
 }

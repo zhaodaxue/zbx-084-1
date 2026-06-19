@@ -41,8 +41,10 @@ const CalendarHeatmap: React.FC = () => {
   }, [selectedStation, currentYear, currentMonth, setDailySummary, setIsLoading, setError]);
 
   useEffect(() => {
-    loadDailySummary();
-  }, [loadDailySummary]);
+    if (selectedStation) {
+      loadDailySummary();
+    }
+  }, [selectedStation, currentYear, currentMonth, loadDailySummary]);
 
   const summaryMap = useMemo(() => {
     const map = new Map<string, {

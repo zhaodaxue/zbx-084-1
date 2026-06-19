@@ -23,3 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 .vite
+
+# Build artifacts
+*.tsbuildinfo
+
+# Trae IDE
+.trae/

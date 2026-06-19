@@ -9,20 +9,11 @@ import { useAppStore } from './store/useAppStore';
 import { downloadSampleCsv } from './utils/api';
 
 const App: React.FC = () => {
-  const { error, setError, importReport, stations, setStations } = useAppStore();
+  const { error, setError, refreshStationsAndSelectFirst, stations } = useAppStore();
 
   useEffect(() => {
-    if (importReport) {
-      fetch('/api/stations')
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && data.data) {
-            setStations(data.data);
-          }
-        })
-        .catch(() => {});
-    }
-  }, [importReport, setStations]);
+    refreshStationsAndSelectFirst();
+  }, [refreshStationsAndSelectFirst]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">

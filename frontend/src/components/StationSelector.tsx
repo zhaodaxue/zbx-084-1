@@ -1,53 +1,31 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { Building2, RefreshCw } from 'lucide-react';
-import { getStations, getStationStats } from '../utils/api';
 import { useAppStore } from '../store/useAppStore';
 
 const StationSelector: React.FC = () => {
   const {
     stations,
     selectedStation,
-    setStations,
     setSelectedStation,
-    setStationStats,
+    loadStationData,
+    refreshStationsAndSelectFirst,
     setIsLoading,
     setError
   } = useAppStore();
-
-  const loadStations = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await getStations();
-      setStations(data);
-      if (data.length > 0 && !selectedStation) {
-        setSelectedStation(data[0]);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '加载站点列表失败');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedStation, setStations, setSelectedStation, setIsLoading, setError]);
 
   const handleStationChange = useCallback(async (stationId: string) => {
     setSelectedStation(stationId);
     if (stationId) {
       setIsLoading(true);
       try {
-        const stats = await getStationStats(stationId);
-        setStationStats(stats);
+        await loadStationData(stationId);
       } catch (err) {
         setError(err instanceof Error ? err.message : '加载统计数据失败');
       } finally {
         setIsLoading(false);
       }
     }
-  }, [setSelectedStation, setStationStats, setIsLoading, setError]);
-
-  useEffect(() => {
-    loadStations();
-  }, [loadStations]);
+  }, [setSelectedStation, loadStationData, setIsLoading, setError]);
 
   return (
     <div className="space-y-3">
@@ -57,7 +35,7 @@ const StationSelector: React.FC = () => {
           选择站点
         </h3>
         <button
-          onClick={loadStations}
+          onClick={refreshStationsAndSelectFirst}
           className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
           title="刷新站点列表"
         >
